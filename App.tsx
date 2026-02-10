@@ -21,6 +21,19 @@ import {
   Info
 } from 'lucide-react';
 
+// --- Analytics Helper ---
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+const trackEvent = (eventName: string, params?: Record<string, string | number | boolean>) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, params);
+  }
+};
+
 // --- Constants ---
 const REFERRAL_CODE = "BITUNIXBONUS";
 const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}`;
@@ -56,7 +69,8 @@ const Button: React.FC<{
   href?: string;
   variant?: 'primary' | 'outline' | 'ghost';
   fullWidth?: boolean;
-}> = ({ children, className = "", onClick, href, variant = 'primary', fullWidth = false }) => {
+  trackLabel?: string;
+}> = ({ children, className = "", onClick, href, variant = 'primary', fullWidth = false, trackLabel }) => {
   const baseStyles = "inline-flex items-center justify-center px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 text-center";
   const variants = {
     primary: "bg-[#b9f641] text-black hover:bg-[#a6de3a] pulse-glow",
@@ -66,16 +80,25 @@ const Button: React.FC<{
 
   const combinedClasses = `${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`;
 
+  const handleClick = () => {
+    trackEvent('cta_click', {
+      button_label: trackLabel || (typeof children === 'string' ? children : 'button'),
+      button_variant: variant,
+      destination_url: href || 'none',
+    });
+    onClick?.();
+  };
+
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={combinedClasses}>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={combinedClasses} onClick={handleClick}>
         {children}
       </a>
     );
   }
 
   return (
-    <button onClick={onClick} className={combinedClasses}>
+    <button onClick={handleClick} className={combinedClasses}>
       {children}
     </button>
   );
@@ -89,10 +112,17 @@ const Section: React.FC<{ children: React.ReactNode; className?: string; id?: st
 
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const toggleFAQ = () => {
+    const nextState = !isOpen;
+    setIsOpen(nextState);
+    if (nextState) {
+      trackEvent('faq_open', { question });
+    }
+  };
   return (
     <div className="border-b border-[#2a2a2a] py-4">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
+      <button
+        onClick={toggleFAQ}
         className="w-full flex items-center justify-between text-left focus:outline-none"
       >
         <h3 className="text-lg font-semibold text-white pr-4">{question}</h3>
@@ -193,7 +223,11 @@ const BonusCalculator: React.FC = () => {
                 max="1500000" 
                 step="5000"
                 value={volume} 
-                onChange={(e) => setVolume(Number(e.target.value))}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  setVolume(val);
+                  trackEvent('calculator_volume_change', { value: val });
+                }}
                 className="w-full h-2 bg-[#2a2a2a] rounded-lg appearance-none cursor-pointer accent-[#b9f641]"
               />
               <div className="flex justify-between text-[10px] text-gray-600 font-bold">
@@ -228,7 +262,11 @@ const BonusCalculator: React.FC = () => {
                 max="10000" 
                 step="100"
                 value={deposit} 
-                onChange={(e) => setDeposit(Number(e.target.value))}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  setDeposit(val);
+                  trackEvent('calculator_deposit_change', { value: val });
+                }}
                 className="w-full h-2 bg-[#2a2a2a] rounded-lg appearance-none cursor-pointer accent-[#b9f641]"
               />
               <div className="flex justify-between text-[10px] text-gray-600 font-bold">
@@ -274,7 +312,7 @@ const BonusCalculator: React.FC = () => {
             </div>
 
             <div className="pt-8">
-              <Button href={REGISTER_URL} fullWidth className="max-w-xs mx-auto">Lock In My Bonus Now</Button>
+              <Button href={REGISTER_URL} fullWidth className="max-w-xs mx-auto" trackLabel="calculator_lock_bonus">Lock In My Bonus Now</Button>
             </div>
           </div>
         </div>
@@ -291,30 +329,42 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    const trackedSections = new Set<string>();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+
+          const sectionId = entry.target.id || entry.target.getAttribute('data-section') || 'unnamed';
+          if (sectionId !== 'unnamed' && !trackedSections.has(sectionId)) {
+            trackedSections.add(sectionId);
+            trackEvent('section_view', { section_id: sectionId });
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section').forEach(section => observer.observe(section));
+
     const handleScroll = () => {
       setShowSticky(window.scrollY > 400);
       setIsScrolled(window.scrollY > 20);
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.remove('opacity-0', 'translate-y-8');
-            entry.target.classList.add('opacity-100', 'translate-y-0');
-          }
-        });
-      }, { threshold: 0.1 });
-
-      document.querySelectorAll('section').forEach(section => observer.observe(section));
     };
 
     window.addEventListener('scroll', handleScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(REFERRAL_CODE);
     setCopied(true);
+    trackEvent('copy_referral_code', { code: REFERRAL_CODE });
     setTimeout(() => setCopied(false), 2000);
   }, []);
 
@@ -330,16 +380,16 @@ export default function App() {
             <a href="#bonuses" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Bonuses</a>
             <a href="#calculator" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Calculator</a>
             <a href="#vip" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">VIP Benefits</a>
-            <Button href={REGISTER_URL} className="px-6 py-2.5 text-sm">Register Now</Button>
+            <Button href={REGISTER_URL} className="px-6 py-2.5 text-sm" trackLabel="nav_register">Register Now</Button>
           </div>
           <div className="md:hidden">
-            <Button href={REGISTER_URL} className="px-5 py-2 text-xs">Join Now</Button>
+            <Button href={REGISTER_URL} className="px-5 py-2 text-xs" trackLabel="nav_mobile_join">Join Now</Button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
         {/* Background Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle,rgba(185,246,65,0.08)_0%,rgba(0,0,0,0)_60%)] pointer-events-none" />
         
@@ -358,7 +408,7 @@ export default function App() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
-            <Button href={REGISTER_URL}>
+            <Button href={REGISTER_URL} trackLabel="hero_claim_bonus">
               Claim Your Bonus Now <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <div className="flex flex-col items-center">
@@ -441,7 +491,7 @@ export default function App() {
             ))}
           </div>
           <div className="mt-16 text-center">
-            <Button href={REGISTER_URL} className="w-full md:w-auto px-12">Claim My 7,700 USDT Bonus</Button>
+            <Button href={REGISTER_URL} className="w-full md:w-auto px-12" trackLabel="steps_claim_bonus">Claim My 7,700 USDT Bonus</Button>
           </div>
         </div>
       </Section>
@@ -504,7 +554,7 @@ export default function App() {
               ))}
             </div>
 
-            <Button href={VIP_PLAN_URL} variant="primary">Apply for VIP Level Up <ArrowRight className="ml-2 w-5 h-5" /></Button>
+            <Button href={VIP_PLAN_URL} variant="primary" trackLabel="vip_level_up_apply">Apply for VIP Level Up <ArrowRight className="ml-2 w-5 h-5" /></Button>
           </div>
         </div>
       </Section>
@@ -533,7 +583,7 @@ export default function App() {
       </Section>
 
       {/* Anniversary Section */}
-      <section className="py-20 bg-[#b9f641] text-black">
+      <section id="anniversary" className="py-20 bg-[#b9f641] text-black">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="md:w-1/2">
             <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight">🎉 Bitunix 4th Anniversary <br/> $4M USDT Giveaway</h2>
@@ -543,7 +593,7 @@ export default function App() {
               <li className="flex items-center gap-2">• Win real Tesla vehicles and physical gold</li>
               <li className="flex items-center gap-2">• Simple tasks: trade, deposit, share, invite</li>
             </ul>
-            <Button href={ANNIVERSARY_URL} className="bg-black text-white border-none px-12">Join Event Now</Button>
+            <Button href={ANNIVERSARY_URL} className="bg-black text-white border-none px-12" trackLabel="anniversary_join_event">Join Event Now</Button>
           </div>
           <div className="md:w-1/2 bg-black/10 rounded-[40px] p-8 md:p-12">
             <div className="text-center">
@@ -598,11 +648,11 @@ export default function App() {
       </Section>
 
       {/* Final CTA */}
-      <section className="py-24 px-4 bg-gradient-to-t from-[#b9f641]/10 to-transparent">
+      <section id="final-cta" className="py-24 px-4 bg-gradient-to-t from-[#b9f641]/10 to-transparent">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-6xl font-black mb-8">Don't Miss Out — Start Trading with VIP Privileges Today</h2>
           <div className="mb-12">
-            <Button href={REGISTER_URL} className="px-16 text-2xl h-20">Sign Up with Code {REFERRAL_CODE} <ArrowRight className="ml-3 w-8 h-8" /></Button>
+            <Button href={REGISTER_URL} className="px-16 text-2xl h-20" trackLabel="final_cta_signup">Sign Up with Code {REFERRAL_CODE} <ArrowRight className="ml-3 w-8 h-8" /></Button>
           </div>
           <div className="inline-flex items-center gap-4 bg-white/5 border border-white/10 px-8 py-4 rounded-2xl group cursor-pointer" onClick={copyToClipboard}>
             <span className="text-gray-400">Referral Code:</span>
@@ -638,7 +688,7 @@ export default function App() {
 
       {/* Sticky Mobile CTA */}
       <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm transition-all duration-500 md:hidden ${showSticky ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
-        <Button href={REGISTER_URL} fullWidth className="shadow-[0_10px_40px_rgba(185,246,65,0.4)]">
+        <Button href={REGISTER_URL} fullWidth className="shadow-[0_10px_40px_rgba(185,246,65,0.4)]" trackLabel="sticky_mobile_signup">
           Sign Up Now
         </Button>
       </div>
