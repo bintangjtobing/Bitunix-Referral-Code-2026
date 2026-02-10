@@ -243,7 +243,7 @@ const BonusCalculator: React.FC = () => {
           <div className="p-6 bg-[#b9f641]/5 border border-[#b9f641]/20 rounded-2xl flex gap-4 items-start">
             <AlertCircle className="text-[#b9f641] shrink-0 w-5 h-5 mt-0.5" />
             <div className="text-xs text-gray-400 leading-relaxed">
-              <span className="text-[#b9f641] font-bold">Note:</span> Bonuses are unlocked in stages. A minimum of $100 deposit and $1,000 trading volume is required to begin the unlocking process. High-volume traders (>$1M) unlock the full 7,700 USDT package.
+              <span className="text-[#b9f641] font-bold">Note:</span> Bonuses are unlocked in stages. A minimum of $100 deposit and $1,000 trading volume is required to begin the unlocking process. High-volume traders (&gt;$1M) unlock the full 7,700 USDT package.
             </div>
           </div>
         </div>
