@@ -1,10 +1,67 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchArticleList, type ArticleFile } from '../lib/github-api';
+import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
+import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
 
 const PER_PAGE = 24;
+
+function extractExcerpt(raw: string, maxLen = 120): string {
+  const { content } = parseFrontmatter(raw);
+  let text = content
+    // Remove setext H1 (Title\n====)
+    .replace(/^[^\n]+\n=+\s*\n?/m, '')
+    // Remove ATX H1
+    .replace(/^#\s+[^\n]+\n*/m, '')
+    // Remove figure/image blocks
+    .replace(/<figure[^>]*>.*?<\/figure>/gi, '')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+    // Remove HTML tags
+    .replace(/<[^>]+>/g, '')
+    // Remove markdown formatting
+    .replace(/[#*`>|~_]/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .trim();
+
+  // Get first non-empty paragraph
+  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 20);
+  const first = (paragraphs[0] || '').replace(/\s+/g, ' ').trim();
+  if (first.length <= maxLen) return first;
+  return first.slice(0, maxLen).replace(/\s\S*$/, '') + '...';
+}
+
+function ArticleCard({ article }: { article: ArticleFile }) {
+  const [excerpt, setExcerpt] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchArticleContent(article.path)
+      .then((raw) => setExcerpt(extractExcerpt(raw)))
+      .catch(() => setExcerpt(''))
+      .finally(() => setLoading(false));
+  }, [article.path]);
+
+  return (
+    <Link
+      to={`/blog/${encodeURIComponent(article.slug)}`}
+      className="group block bg-[#0f0f0f] border border-[#2a2a2a] rounded-2xl p-6 hover:border-[#b9f641]/50 transition-all duration-300"
+      onClick={() => trackEvent('article_click', { article_title: article.title, article_slug: article.slug })}
+    >
+      <h2 className="text-lg font-bold text-white group-hover:text-[#b9f641] transition-colors leading-snug mb-2">
+        {article.title}
+      </h2>
+      {loading ? (
+        <div className="space-y-2">
+          <div className="h-3 bg-[#1a1a1a] rounded w-full animate-pulse" />
+          <div className="h-3 bg-[#1a1a1a] rounded w-3/4 animate-pulse" />
+        </div>
+      ) : (
+        excerpt && <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{excerpt}</p>
+      )}
+    </Link>
+  );
+}
 
 export default function Blog() {
   const [articles, setArticles] = useState<ArticleFile[]>([]);
@@ -114,16 +171,7 @@ export default function Blog() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {paginated.map((article) => (
-                <Link
-                  key={article.slug}
-                  to={`/blog/${encodeURIComponent(article.slug)}`}
-                  className="group block bg-[#0f0f0f] border border-[#2a2a2a] rounded-2xl p-6 hover:border-[#b9f641]/50 transition-all duration-300"
-                  onClick={() => trackEvent('article_click', { article_title: article.title, article_slug: article.slug })}
-                >
-                  <h2 className="text-lg font-bold text-white group-hover:text-[#b9f641] transition-colors leading-snug">
-                    {article.title}
-                  </h2>
-                </Link>
+                <ArticleCard key={article.slug} article={article} />
               ))}
             </div>
 
