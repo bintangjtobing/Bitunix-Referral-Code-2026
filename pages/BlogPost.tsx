@@ -8,7 +8,7 @@ import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/
 import { parseFrontmatter } from '../lib/frontmatter';
 
 const REFERRAL_CODE = 'BITUNIXBONUS';
-const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}`;
+const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}&utm_source=3rdparty&utm_medium=github-article`;
 
 const CTAWidget = () => (
   <div className="not-prose my-8 p-8 bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl text-center">
