@@ -82,7 +82,16 @@ function processMarkdownContent(md: string): string {
   // 10. Ensure blank line before HR ---
   processed = processed.replace(/([^\n])\n(---\s*\n)/g, '$1\n\n$2');
 
-  // 11. Clean up excess blank lines
+  // 11. Convert markdown bold/italic inside HTML table cells to HTML tags
+  //     rehypeRaw doesn't process markdown syntax within HTML blocks
+  processed = processed.replace(/(<t[dh][^>]*>)([\s\S]*?)(<\/t[dh]>)/gi, (_, open, content, close) => {
+    let c = content;
+    c = c.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    c = c.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    return open + c + close;
+  });
+
+  // 12. Clean up excess blank lines
   processed = processed.replace(/\n{3,}/g, '\n\n');
 
   return processed.trim();
