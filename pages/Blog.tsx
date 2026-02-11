@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchArticleList, type ArticleFile } from '../lib/github-api';
+import { trackEvent, updateSEO } from '../lib/analytics';
 
 const PER_PAGE = 24;
 
@@ -13,7 +14,12 @@ export default function Blog() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    document.title = 'Blog — Bitunix Referral Code 2026';
+    updateSEO({
+      title: 'Crypto Blog — Bitunix Referral Code 2026',
+      description: 'Latest crypto insights, trading guides, and market analysis. Use referral code BITUNIXBONUS for up to 7,700 USDT bonus.',
+      path: '/blog',
+    });
+    trackEvent('page_view', { page_title: 'Blog', page_path: '/blog' });
     fetchArticleList()
       .then(setArticles)
       .catch((e) => setError(e.message))
@@ -34,6 +40,13 @@ export default function Blog() {
   useEffect(() => {
     setPage(1);
   }, [search]);
+
+  // Track page changes
+  useEffect(() => {
+    if (currentPage > 1) {
+      trackEvent('blog_paginate', { page_number: currentPage });
+    }
+  }, [currentPage]);
 
   // Windowed page numbers
   const pageNumbers = useMemo(() => {
@@ -65,7 +78,13 @@ export default function Blog() {
               type="text"
               placeholder="Search articles..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearch(val);
+                if (val.length >= 3) {
+                  trackEvent('blog_search', { search_term: val });
+                }
+              }}
               className="w-full pl-12 pr-4 py-4 bg-[#0f0f0f] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#b9f641]/50 transition-colors"
             />
           </div>
@@ -99,6 +118,7 @@ export default function Blog() {
                   key={article.slug}
                   to={`/blog/${encodeURIComponent(article.slug)}`}
                   className="group block bg-[#0f0f0f] border border-[#2a2a2a] rounded-2xl p-6 hover:border-[#b9f641]/50 transition-all duration-300"
+                  onClick={() => trackEvent('article_click', { article_title: article.title, article_slug: article.slug })}
                 >
                   <h2 className="text-lg font-bold text-white group-hover:text-[#b9f641] transition-colors leading-snug">
                     {article.title}

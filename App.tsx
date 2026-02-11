@@ -23,19 +23,7 @@ import {
 } from 'lucide-react';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
-
-// --- Analytics Helper ---
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
-const trackEvent = (eventName: string, params?: Record<string, string | number | boolean>) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, params);
-  }
-};
+import { trackEvent, updateSEO } from './lib/analytics';
 
 // --- Constants ---
 const REFERRAL_CODE = "BITUNIXBONUS";
@@ -330,7 +318,11 @@ function HomePage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    document.title = 'Bitunix Referral Code 2026: BITUNIXBONUS \u2014 Get 7,700 USDT + VIP 2 Instant';
+    updateSEO({
+      title: 'Bitunix Referral Code 2026: BITUNIXBONUS \u2014 Get 7,700 USDT + VIP 2 Instant',
+      description: 'Use Bitunix referral code BITUNIXBONUS to unlock up to 7,700 USDT bonus, 77.7% trading fee discount, and instant VIP 2 status for 30 days. Minimum deposit $100. Sign up now.',
+      path: '/',
+    });
   }, []);
 
   const copyToClipboard = useCallback(() => {

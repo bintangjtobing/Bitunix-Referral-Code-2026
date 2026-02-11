@@ -6,11 +6,12 @@ import rehypeRaw from 'rehype-raw';
 import { ArrowLeft, ArrowRight, Calendar, Tag } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
+import { trackEvent, updateSEO } from '../lib/analytics';
 
 const REFERRAL_CODE = 'BITUNIXBONUS';
 const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}&utm_source=3rdparty&utm_medium=github-article`;
 
-const CTAWidget = () => (
+const CTAWidget = ({ position = 'inline' }: { position?: string }) => (
   <div className="not-prose my-8 p-8 bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl text-center">
     <h3 className="text-2xl font-black text-white mb-3">Ready to Start Trading?</h3>
     <p className="text-gray-400 mb-6">
@@ -20,6 +21,7 @@ const CTAWidget = () => (
       href={REGISTER_URL}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackEvent('blog_cta_click', { cta_position: position })}
       className="inline-flex items-center justify-center px-8 py-4 rounded-full font-bold bg-[#b9f641] text-black hover:bg-[#a6de3a] transition-all duration-300 transform hover:scale-105 active:scale-95 pulse-glow"
     >
       Claim Your Bonus <ArrowRight className="ml-2 w-5 h-5" />
@@ -84,9 +86,19 @@ export default function BlogPost() {
 
   useEffect(() => {
     if (title) {
-      document.title = `${title} — Bitunix Blog`;
+      const desc = `Read "${title}" — crypto insights and trading guides. Use referral code BITUNIXBONUS for up to 7,700 USDT bonus on Bitunix.`;
+      updateSEO({
+        title: `${title} — Bitunix Blog`,
+        description: desc.slice(0, 160),
+        path: `/blog/${slug}`,
+      });
+      trackEvent('article_view', {
+        article_title: title,
+        article_slug: slug || '',
+        article_categories: categories.join(', '),
+      });
     }
-  }, [title]);
+  }, [title, slug, categories]);
 
   if (loading) {
     return (
@@ -153,19 +165,8 @@ export default function BlogPost() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 p-8 bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl text-center">
-          <h3 className="text-2xl font-black mb-3">Ready to Start Trading?</h3>
-          <p className="text-gray-400 mb-6">
-            Use referral code <span className="text-[#b9f641] font-bold">{REFERRAL_CODE}</span> for up to 7,700 USDT bonus.
-          </p>
-          <a
-            href={REGISTER_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center px-8 py-4 rounded-full font-bold bg-[#b9f641] text-black hover:bg-[#a6de3a] transition-all duration-300 transform hover:scale-105 active:scale-95 pulse-glow"
-          >
-            Claim Your Bonus <ArrowRight className="ml-2 w-5 h-5" />
-          </a>
+        <div className="mt-16">
+          <CTAWidget position="bottom" />
         </div>
       </article>
     </div>
