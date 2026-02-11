@@ -37,13 +37,6 @@ const markdownComponents = {
     }
     return <img src={src} {...props} />;
   },
-  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-    // Replace bitunix register links with CTA widget
-    if (href && href.includes('bitunix.com/register')) {
-      return <CTAWidget />;
-    }
-    return <a href={href} {...props}>{children}</a>;
-  },
 };
 
 export default function BlogPost() {
