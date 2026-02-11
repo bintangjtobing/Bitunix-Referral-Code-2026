@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  CheckCircle, 
-  ChevronDown, 
-  Copy, 
-  ShieldCheck, 
-  Trophy, 
-  Zap, 
-  Globe, 
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import {
+  CheckCircle,
+  ChevronDown,
+  Copy,
+  ShieldCheck,
+  Trophy,
+  Zap,
+  Globe,
   ArrowRight,
   TrendingUp,
   UserCheck,
@@ -20,6 +21,8 @@ import {
   X,
   Info
 } from 'lucide-react';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 
 // --- Analytics Helper ---
 declare global {
@@ -43,11 +46,11 @@ const ANNIVERSARY_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipC
 // --- Components ---
 
 const BitunixLogo: React.FC<{ className?: string }> = ({ className = "" }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 108 24" 
-    fill="none" 
-    className={className} 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 108 24"
+    fill="none"
+    className={className}
     preserveAspectRatio="xMidYMid meet"
   >
     <path d="M21.8073 3.17745C22.1029 3.17745 22.3252 3.44684 22.2692 3.73702L20.3571 13.5876C20.0811 15.0081 19.2591 16.2055 18.1354 16.9812C18.1592 16.8888 18.1824 16.7956 18.2008 16.7009L18.8678 13.2614C19.7666 8.6246 16.214 4.31808 11.4908 4.31808H7.86389C8.78193 3.59964 9.93427 3.17745 11.1705 3.17745H21.8073Z" fill="#b9f641"></path>
@@ -169,7 +172,7 @@ const BonusCalculator: React.FC = () => {
 
   const calculatedBonus = useMemo(() => {
     let total = 20; // Signup base
-    
+
     // Deposit Tiers
     if (deposit >= 100) total += 30;
     if (deposit >= 500) total += 50;
@@ -217,12 +220,12 @@ const BonusCalculator: React.FC = () => {
                 </div>
                 <span className="text-2xl font-black text-[#b9f641]">${volume.toLocaleString()}</span>
               </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="1500000" 
+              <input
+                type="range"
+                min="0"
+                max="1500000"
                 step="5000"
-                value={volume} 
+                value={volume}
                 onChange={(e) => {
                   const val = Number(e.target.value);
                   setVolume(val);
@@ -256,12 +259,12 @@ const BonusCalculator: React.FC = () => {
                 </div>
                 <span className="text-2xl font-black text-[#b9f641]">${deposit.toLocaleString()}</span>
               </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="10000" 
+              <input
+                type="range"
+                min="0"
+                max="10000"
                 step="100"
-                value={deposit} 
+                value={deposit}
                 onChange={(e) => {
                   const val = Number(e.target.value);
                   setDeposit(val);
@@ -288,7 +291,7 @@ const BonusCalculator: React.FC = () => {
 
         <div className="lg:w-1/2 flex flex-col justify-center items-center text-center p-8 bg-black rounded-3xl border border-[#2a2a2a] relative overflow-hidden group">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(185,246,65,0.05)_0%,transparent_70%)] pointer-events-none" />
-          
+
           <div className="relative z-10 space-y-6 w-full">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-[#b9f641]/10 rounded-full mb-4">
               <Coins className="text-[#b9f641] w-10 h-10" />
@@ -297,15 +300,15 @@ const BonusCalculator: React.FC = () => {
             <div className="text-7xl md:text-8xl font-black text-white tracking-tighter">
               {calculatedBonus.toLocaleString()}<span className="text-2xl md:text-4xl text-[#b9f641] ml-2">USDT</span>
             </div>
-            
+
             <div className="w-full max-w-sm mx-auto space-y-2">
               <div className="flex justify-between text-[10px] font-bold uppercase text-gray-500">
                 <span>Progress to Max</span>
                 <span>{percentage.toFixed(0)}%</span>
               </div>
               <div className="h-3 w-full bg-[#1a1a1a] rounded-full overflow-hidden border border-[#2a2a2a]">
-                <div 
-                  className="h-full bg-gradient-to-r from-[#b9f641]/50 to-[#b9f641] transition-all duration-500 ease-out" 
+                <div
+                  className="h-full bg-gradient-to-r from-[#b9f641]/50 to-[#b9f641] transition-all duration-500 ease-out"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
@@ -321,44 +324,13 @@ const BonusCalculator: React.FC = () => {
   );
 };
 
-// --- Main App ---
+// --- HomePage Component ---
 
-export default function App() {
+function HomePage() {
   const [copied, setCopied] = useState(false);
-  const [showSticky, setShowSticky] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const trackedSections = new Set<string>();
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('opacity-0', 'translate-y-8');
-          entry.target.classList.add('opacity-100', 'translate-y-0');
-
-          const sectionId = entry.target.id || entry.target.getAttribute('data-section') || 'unnamed';
-          if (sectionId !== 'unnamed' && !trackedSections.has(sectionId)) {
-            trackedSections.add(sectionId);
-            trackEvent('section_view', { section_id: sectionId });
-          }
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('section').forEach(section => observer.observe(section));
-
-    const handleScroll = () => {
-      setShowSticky(window.scrollY > 400);
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      observer.disconnect();
-    };
+    document.title = 'Bitunix Referral Code 2026: BITUNIXBONUS \u2014 Get 7,700 USDT + VIP 2 Instant';
   }, []);
 
   const copyToClipboard = useCallback(() => {
@@ -369,40 +341,22 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
-      {/* Navigation */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <a href="#" className="hover:opacity-80 transition-opacity">
-            <BitunixLogo className="w-24 md:w-32 h-auto text-white" />
-          </a>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#bonuses" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Bonuses</a>
-            <a href="#calculator" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Calculator</a>
-            <a href="#vip" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">VIP Benefits</a>
-            <Button href={REGISTER_URL} className="px-6 py-2.5 text-sm" trackLabel="nav_register">Register Now</Button>
-          </div>
-          <div className="md:hidden">
-            <Button href={REGISTER_URL} className="px-5 py-2 text-xs" trackLabel="nav_mobile_join">Join Now</Button>
-          </div>
-        </div>
-      </nav>
-
+    <>
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
         {/* Background Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle,rgba(185,246,65,0.08)_0%,rgba(0,0,0,0)_60%)] pointer-events-none" />
-        
+
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
           <div className="inline-block px-4 py-1.5 rounded-full border border-[#b9f641]/30 bg-[#b9f641]/5 text-[#b9f641] text-sm font-bold tracking-wider mb-8 animate-bounce">
             🔥 EXCLUSIVE REFERRAL PROMOTION 2026
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-tight leading-[1.1]">
             Unlock Up to <span className="text-[#b9f641]">7,700 USDT</span> <br className="hidden md:block"/>
             + 77.7% Fee Discount
           </h1>
-          
+
           <p className="text-lg md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto">
             Use Bitunix Referral Code: <span className="text-white font-bold">{REFERRAL_CODE}</span> — Get Instant <span className="text-white font-bold underline decoration-[#b9f641]">VIP 2 Status</span> for 30 Days.
           </p>
@@ -412,7 +366,7 @@ export default function App() {
               Claim Your Bonus Now <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <div className="flex flex-col items-center">
-              <button 
+              <button
                 onClick={copyToClipboard}
                 className="flex items-center gap-2 text-white/70 hover:text-white transition-colors bg-[#1a1a1a] px-6 py-4 rounded-full border border-[#2a2a2a] group"
               >
@@ -500,7 +454,7 @@ export default function App() {
       <Section id="vip">
         <h2 className="text-4xl md:text-5xl font-black mb-6 text-center">Why VIP Matters</h2>
         <p className="text-center text-gray-400 mb-16">Your trading edge starts from day one.</p>
-        
+
         <div className="overflow-x-auto hide-scrollbar -mx-4 px-4">
           <table className="w-full min-w-[800px] border-collapse text-left">
             <thead>
@@ -536,11 +490,11 @@ export default function App() {
       <Section className="bg-gradient-to-b from-black to-[#050505]">
         <div className="bg-[#1a1a1a] border-2 border-[#b9f641]/20 rounded-[40px] p-8 md:p-16 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#b9f641]/10 blur-[100px] pointer-events-none" />
-          
+
           <div className="max-w-3xl">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4">Already a VIP on another Exchange?</h2>
             <p className="text-xl text-[#b9f641] font-bold mb-8 italic">Get VIP+1 on Bitunix — Instantly</p>
-            
+
             <ul className="space-y-4 mb-12 text-gray-300">
               <li className="flex items-center gap-3"><CheckCircle className="text-[#b9f641] w-5 h-5" /> Enjoy up to 87% Fee Discount instantly</li>
               <li className="flex items-center gap-3"><CheckCircle className="text-[#b9f641] w-5 h-5" /> Receive Exclusive Mystery Boxes Weekly</li>
@@ -619,29 +573,29 @@ export default function App() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black mb-16 text-center">Frequently Asked <span className="text-[#b9f641]">Questions</span></h2>
           <div className="space-y-4">
-            <FAQItem 
-              question="What is the Bitunix referral code?" 
-              answer={`The referral code is ${REFERRAL_CODE}. Enter it during registration to unlock up to 7,700 USDT in bonuses and 77.7% fee discount.`} 
+            <FAQItem
+              question="What is the Bitunix referral code?"
+              answer={`The referral code is ${REFERRAL_CODE}. Enter it during registration to unlock up to 7,700 USDT in bonuses and 77.7% fee discount.`}
             />
-            <FAQItem 
-              question="What is the minimum deposit?" 
-              answer="The minimum initial deposit is $100 to activate your bonus rewards package." 
+            <FAQItem
+              question="What is the minimum deposit?"
+              answer="The minimum initial deposit is $100 to activate your bonus rewards package."
             />
-            <FAQItem 
-              question="How do I upgrade from VIP 2 to VIP 3?" 
-              answer="Deposit $375 during your 30-day VIP 2 trial period to automatically upgrade to VIP 3 with additional benefits like Guaranteed Stop-Loss." 
+            <FAQItem
+              question="How do I upgrade from VIP 2 to VIP 3?"
+              answer="Deposit $375 during your 30-day VIP 2 trial period to automatically upgrade to VIP 3 with additional benefits like Guaranteed Stop-Loss."
             />
-            <FAQItem 
-              question="Can I apply the referral code after registration?" 
-              answer={`No, the referral code ${REFERRAL_CODE} must be entered during the registration process. It cannot be added later.`} 
+            <FAQItem
+              question="Can I apply the referral code after registration?"
+              answer={`No, the referral code ${REFERRAL_CODE} must be entered during the registration process. It cannot be added later.`}
             />
-            <FAQItem 
-              question="I'm already VIP on another exchange. Can I get a higher level?" 
-              answer="Yes! Upload proof of your VIP status or 30-day trading volume from another exchange. Bitunix will match and upgrade you to VIP+1." 
+            <FAQItem
+              question="I'm already VIP on another exchange. Can I get a higher level?"
+              answer="Yes! Upload proof of your VIP status or 30-day trading volume from another exchange. Bitunix will match and upgrade you to VIP+1."
             />
-            <FAQItem 
-              question="Is Bitunix safe?" 
-              answer="Bitunix has institutional-grade security (Fireblocks + Elliptic), $42M insurance coverage, a $30M USDC Care Fund, Proof of Reserves, and zero history of security breaches." 
+            <FAQItem
+              question="Is Bitunix safe?"
+              answer="Bitunix has institutional-grade security (Fireblocks + Elliptic), $42M insurance coverage, a $30M USDC Care Fund, Proof of Reserves, and zero history of security breaches."
             />
           </div>
         </div>
@@ -662,13 +616,124 @@ export default function App() {
           {copied && <div className="mt-4 text-[#b9f641] font-bold animate-pulse">Copied to clipboard!</div>}
         </div>
       </section>
+    </>
+  );
+}
+
+// --- Main App ---
+
+export default function App() {
+  const [showSticky, setShowSticky] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === '/' || location.pathname === '';
+
+  useEffect(() => {
+    const trackedSections = new Set<string>();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+
+          const sectionId = entry.target.id || entry.target.getAttribute('data-section') || 'unnamed';
+          if (sectionId !== 'unnamed' && !trackedSections.has(sectionId)) {
+            trackedSections.add(sectionId);
+            trackEvent('section_view', { section_id: sectionId });
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section').forEach(section => observer.observe(section));
+
+    const handleScroll = () => {
+      setShowSticky(window.scrollY > 400);
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, [location.pathname]);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  return (
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          <Link to="/" className="hover:opacity-80 transition-opacity">
+            <BitunixLogo className="w-24 md:w-32 h-auto text-white" />
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            {isHome ? (
+              <>
+                <a href="#bonuses" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Bonuses</a>
+                <a href="#calculator" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Calculator</a>
+                <a href="#vip" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">VIP Benefits</a>
+              </>
+            ) : (
+              <Link to="/" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Home</Link>
+            )}
+            <Link to="/blog" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">Blog</Link>
+            <Button href={REGISTER_URL} className="px-6 py-2.5 text-sm" trackLabel="nav_register">Register Now</Button>
+          </div>
+          <div className="md:hidden flex items-center gap-3">
+            <Button href={REGISTER_URL} className="px-5 py-2 text-xs" trackLabel="nav_mobile_join">Join Now</Button>
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-1">
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/5 px-4 py-6 space-y-4">
+            {isHome && (
+              <>
+                <a href="#bonuses" className="block text-sm font-semibold text-gray-400 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>Bonuses</a>
+                <a href="#calculator" className="block text-sm font-semibold text-gray-400 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>Calculator</a>
+                <a href="#vip" className="block text-sm font-semibold text-gray-400 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>VIP Benefits</a>
+              </>
+            )}
+            {!isHome && (
+              <Link to="/" className="block text-sm font-semibold text-gray-400 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            )}
+            <Link to="/blog" className="block text-sm font-semibold text-gray-400 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
+          </div>
+        )}
+      </nav>
+
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
 
       {/* Footer */}
-      <footer className="py-16 px-4 bg-black border-t border-[#1a1a1a]">
+      <footer className="py-16 px-4 bg-black border-t border-[#1a1a1a] mt-auto">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-            <BitunixLogo className="w-32 h-auto text-white" />
+            <Link to="/">
+              <BitunixLogo className="w-32 h-auto text-white" />
+            </Link>
             <div className="flex gap-8 text-sm text-gray-400">
+              <Link to="/blog" className="hover:text-[#b9f641]">Blog</Link>
               <a href="#" className="hover:text-[#b9f641]">Privacy Policy</a>
               <a href="#" className="hover:text-[#b9f641]">Terms of Service</a>
               <a href="#" className="hover:text-[#b9f641]">Help Center</a>
@@ -676,12 +741,12 @@ export default function App() {
           </div>
           <div className="border-t border-[#1a1a1a] pt-12 text-gray-500 text-xs md:text-sm leading-relaxed">
             <p className="mb-6">
-              Disclaimer: Trading digital assets involves significant risk and can result in the loss of your invested capital. 
-              The value of cryptocurrency is highly volatile and not suitable for every investor. Always do your own research 
-              before making any financial decisions. Bonus credits are subject to trading volume requirements and full platform 
+              Disclaimer: Trading digital assets involves significant risk and can result in the loss of your invested capital.
+              The value of cryptocurrency is highly volatile and not suitable for every investor. Always do your own research
+              before making any financial decisions. Bonus credits are subject to trading volume requirements and full platform
               Terms & Conditions.
             </p>
-            <p>© 2026 Bitunix. All rights reserved.</p>
+            <p>&copy; 2026 Bitunix. All rights reserved.</p>
           </div>
         </div>
       </footer>
