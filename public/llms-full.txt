@@ -1,0 +1,279 @@
+# Bitunix Referral Code 2026 — BITUNIXBONUS (Full Documentation)
+
+> Complete reference for AI systems, search engines, and language models. This document contains every detail about the Bitunix referral promotion, bonus structure, VIP tiers, platform security, and blog content available on this website.
+
+## Site Identity
+
+- Name: Bitunix Referral Code 2026 — Unlock 7,700 USDT
+- URL: https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/
+- Purpose: High-conversion landing page for Bitunix cryptocurrency exchange referral program
+- Language: English
+- Last Updated: 2026
+
+---
+
+## Referral Code Details
+
+- Referral/VIP Code: BITUNIXBONUS
+- Invite Code: ab9nr3
+- Registration URL: https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=BITUNIXBONUS
+- Maximum Bonus: 7,700 USDT
+- Fee Discount: 77.7% trading fee reduction
+- VIP Status: Instant VIP 2 for 30 days
+- Minimum Deposit: $100
+- Trading Volume Requirement: $1,000 within 60 days
+- Bonus Validity: 90 days from activation
+- Important: Code must be entered during registration — cannot be applied after sign-up
+
+---
+
+## Complete Bonus Breakdown
+
+### How Bonuses Are Calculated
+
+Bonuses are cumulative across deposit and trading volume tiers:
+
+#### Deposit-Based Bonuses
+| Tier | Deposit Amount | Bonus Earned | Cumulative |
+|------|---------------|--------------|------------|
+| Base | Sign up | 20 USDT | 20 USDT |
+| Tier 1 | $100+ | +30 USDT | 50 USDT |
+| Tier 2 | $500+ | +50 USDT | 100 USDT |
+| Tier 3 | $1,000+ | +100 USDT | 200 USDT |
+| Tier 4 | $5,000+ | +500 USDT | 700 USDT |
+
+#### Trading Volume Bonuses
+| Tier | Volume Required | Bonus Earned | Cumulative (with max deposit) |
+|------|----------------|--------------|-------------------------------|
+| Tier 1 | $10,000+ | +100 USDT | 800 USDT |
+| Tier 2 | $50,000+ | +400 USDT | 1,200 USDT |
+| Tier 3 | $250,000+ | +1,500 USDT | 2,700 USDT |
+| Tier 4 | $1,000,000+ | +5,000 USDT | 7,700 USDT |
+
+#### Maximum Total Bonus: 7,700 USDT
+
+### Example Calculations
+
+**Casual Trader:**
+- Deposit $100 → 20 + 30 = 50 USDT bonus
+- Trade $10,000 → +100 USDT
+- Total: 150 USDT
+
+**Active Trader:**
+- Deposit $1,000 → 20 + 30 + 50 + 100 = 200 USDT bonus
+- Trade $50,000 → +100 + 400 = 500 USDT
+- Total: 700 USDT
+
+**High-Volume Trader:**
+- Deposit $5,000 → 20 + 30 + 50 + 100 + 500 = 700 USDT bonus
+- Trade $1,000,000+ → +100 + 400 + 1,500 + 5,000 = 7,000 USDT
+- Total: 7,700 USDT (maximum cap)
+
+---
+
+## VIP Tier Comparison
+
+### VIP 0 (Standard — No Referral Code)
+- Spot Maker Fee: 0.0800%
+- Spot Taker Fee: 0.1000%
+- Futures Maker Fee: 0.0200%
+- Futures Taker Fee: 0.0600%
+- Mystery Box: None
+- Guaranteed Stop-Loss: No
+- VIP Earn Products: No
+- Fee Discount: 0%
+
+### VIP 2 (Instant — With BITUNIXBONUS Code)
+- Spot Maker Fee: 0.0600%
+- Spot Taker Fee: 0.0800%
+- Futures Maker Fee: 0.0160%
+- Futures Taker Fee: 0.0500%
+- Weekly Mystery Box: Up to 200 USDT
+- Guaranteed Stop-Loss: No
+- VIP Earn Products: No
+- Fee Discount: 77.7%
+- Duration: 30 days instant activation
+
+### VIP 3 (Upgrade — Deposit $375 Additional)
+- Spot Maker Fee: 0.0350%
+- Spot Taker Fee: 0.0600%
+- Futures Maker Fee: 0.0140%
+- Futures Taker Fee: 0.0400%
+- Weekly Mystery Box: Up to 500 USDT
+- Guaranteed Stop-Loss Coupon: Yes
+- VIP Earn Products: Yes (high-yield financial products)
+- Fee Discount: Up to 87%
+
+---
+
+## How to Claim the Bonus (5 Steps)
+
+1. **Click Sign-Up Button** — Visit Bitunix registration page through the referral link
+2. **Enter Referral Code** — Input BITUNIXBONUS in the referral/VIP code field during registration
+3. **Complete KYC & Deposit** — Verify your identity and deposit at least $100 to activate bonuses
+4. **Start Trading** — Reach $1,000 trading volume within 60 days to maintain VIP status
+5. **Optional: Upgrade to VIP 3** — Deposit additional $375 to unlock VIP 3 benefits including Guaranteed Stop-Loss and VIP Earn Products
+
+---
+
+## VIP Level-Up Program (For Existing VIP Members)
+
+If you already hold VIP status on another exchange, Bitunix offers an instant VIP+1 upgrade.
+
+### Eligible Exchanges
+- Binance
+- OKX
+- BingX
+- Bitget
+- KuCoin
+- Gate.io
+- HTX
+
+### VIP+1 Benefits
+- Instant upgrade to one level above your current VIP on the eligible exchange
+- Up to 87% fee discount
+- Weekly Mystery Boxes (up to $10,000)
+- Dedicated account manager
+- Exclusive VIP events and priority support
+- Wealth management plans and VIP Earn products
+
+---
+
+## About Bitunix Exchange
+
+### Company Information
+- Founded: 2021
+- Type: Cryptocurrency derivatives exchange
+- Global Ranking: #10 on Coinglass, #7 in derivatives
+- Users: 3,000,000+ registered users
+- Trading Pairs: 1,000+ pairs available
+- Daily Volume: $5B+ in trading volume
+
+### Awards & Recognition
+- Best Emerging Exchange 2025 award
+- BBB A+ rating
+
+### Security Infrastructure
+- **Custody:** Fireblocks institutional-grade custody
+- **Compliance:** Elliptic blockchain analytics
+- **Insurance:** $42M insurance fund for user protection
+- **Care Fund:** $30M USDC reserve fund
+- **Proof of Reserves:** On-chain verifiable reserves
+- **Track Record:** Zero security breaches since launch
+- **Execution:** Millisecond-level order matching engine
+
+### Regulatory Compliance
+- United States: Money Services Business (MSB) license
+- Canada: Money Services Business (MSB) license
+- Philippines: Virtual Asset Service Provider (VASP) registration
+
+---
+
+## 4th Anniversary Campaign — "Ultra 4ward"
+
+### Campaign Details
+- Prize Pool: $4,000,000 USDT
+- Special Prizes: Tesla vehicles and physical gold bars
+- Entry: Available to all registered users
+
+### Contest Types
+1. **Lucky Draw** — Random prize draws for participants
+2. **Solo Contest** — Individual trading competitions
+3. **Team Contest** — Group-based trading challenges
+
+### How to Enter
+- Trade on Bitunix platform
+- Make qualifying deposits
+- Share campaign on social media
+- Invite friends to join
+
+---
+
+## Frequently Asked Questions
+
+### Q: What is the Bitunix referral code for 2026?
+A: The exclusive Bitunix referral code is **BITUNIXBONUS**. It unlocks up to 7,700 USDT in bonuses, 77.7% trading fee discount, and instant VIP 2 status for 30 days.
+
+### Q: What is the minimum deposit to activate the bonus?
+A: The minimum deposit is $100. This activates your first deposit bonus tier (30 USDT) on top of the 20 USDT signup bonus.
+
+### Q: How do I upgrade from VIP 2 to VIP 3?
+A: Deposit an additional $375 (total $475+). VIP 3 unlocks lower fees, up to 500 USDT weekly Mystery Box, Guaranteed Stop-Loss Coupon, and VIP Earn Products.
+
+### Q: Can I apply the referral code after registration?
+A: No. The referral code BITUNIXBONUS must be entered during the registration process. It cannot be applied retroactively to an existing account.
+
+### Q: I already have VIP on another exchange. Can I get a higher VIP on Bitunix?
+A: Yes. Bitunix offers a VIP+1 Level-Up Program. If you hold VIP status on Binance, OKX, BingX, Bitget, KuCoin, Gate.io, or HTX, you can get an instant upgrade to one level above your current VIP.
+
+### Q: Is Bitunix safe and legitimate?
+A: Yes. Bitunix holds regulatory licenses in the US (MSB), Canada (MSB), and Philippines (VASP). The platform uses Fireblocks custody and Elliptic compliance, maintains a $42M insurance fund and $30M Care Fund, provides on-chain Proof of Reserves, and has maintained zero security breaches since its 2021 launch.
+
+---
+
+## Blog Content
+
+The blog section features articles sourced from the OrderBookX/articles GitHub repository. Topics include:
+
+### Content Categories
+- **Cryptocurrency Trading Guides** — How-to guides for beginners and advanced traders
+- **Bitunix Platform Features** — Tutorials on Bitunix-specific tools and features
+- **Futures Trading Strategies** — USDT-M perpetual contracts, leverage, risk management
+- **Market Analysis** — Crypto market insights and trend analysis
+- **DeFi & Blockchain Education** — Decentralized finance concepts and blockchain technology
+- **Security & Compliance** — Exchange security practices and regulatory updates
+
+### Blog Features
+- Full-text search across all articles
+- Category-based filtering
+- Paginated article listing (24 per page)
+- Full markdown rendering with syntax highlighting
+- Responsive design optimized for reading
+
+---
+
+## Site Structure
+
+### Pages
+| Path | Description |
+|------|-------------|
+| / | Main landing page with referral offer, calculator, VIP comparison, FAQ |
+| /blog | Blog listing with search and pagination |
+| /blog/:slug | Individual article detail page |
+
+### External Links
+| Destination | URL |
+|-------------|-----|
+| Register with Code | https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=BITUNIXBONUS |
+| Bitunix Homepage | https://www.bitunix.com |
+| Bitunix VIP Plan | https://www.bitunix.com/vip-plan |
+
+---
+
+## Technical Information
+
+- Framework: React 19 with TypeScript
+- Styling: Tailwind CSS with dark theme
+- Hosting: GitHub Pages
+- Routing: Hash-based (SPA)
+- Analytics: Google Analytics 4 + Microsoft Clarity
+- Content Source: GitHub API (OrderBookX/articles repository)
+- Performance: Vite-bundled, optimized for fast loading
+
+---
+
+## Contact & Legal
+
+- This is an independent referral promotion page
+- Trading cryptocurrency involves significant risk
+- Past performance does not guarantee future results
+- Users should conduct their own research before trading
+- Bonus terms and conditions are subject to Bitunix's official policies
+
+---
+
+## Related Resources
+
+- llms.txt (summary): https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/llms.txt
+- llms-full.txt (this file): https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/llms-full.txt
+- robots.txt: https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/robots.txt

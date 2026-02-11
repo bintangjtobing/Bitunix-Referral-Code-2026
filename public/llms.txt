@@ -1,0 +1,86 @@
+# Bitunix Referral Code 2026 — BITUNIXBONUS
+
+> Exclusive Bitunix referral and VIP bonus promotion. Use code BITUNIXBONUS to unlock up to 7,700 USDT bonus, 77.7% trading fee discount, and instant VIP 2 status on Bitunix cryptocurrency exchange.
+
+## Overview
+
+Bitunix is a cryptocurrency derivatives exchange founded in 2021, ranked #10 on Coinglass among top global platforms. This site provides the exclusive referral code **BITUNIXBONUS** with full details on bonuses, VIP tiers, and how to claim them.
+
+- Referral Code: BITUNIXBONUS
+- Invite Code: ab9nr3
+- Maximum Bonus: 7,700 USDT
+- Fee Discount: 77.7%
+- VIP Status: Instant VIP 2 for 30 days
+- Minimum Deposit: $100
+
+## Pages
+
+- [Home](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/): Main landing page with referral offer, bonus calculator, VIP comparison, FAQ
+- [Blog](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/#/blog): Crypto trading insights, guides, and Bitunix-related articles
+- [Register on Bitunix](https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=BITUNIXBONUS): Sign up with referral code applied
+
+## Key Sections (Home Page)
+
+- Bonus Breakdown: 4-card layout showing all bonus components
+- Bonus Calculator: Interactive tool to estimate your bonus based on deposit and trading volume
+- How to Claim: 5-step guide to activate the referral bonus
+- VIP Comparison Table: Standard vs VIP 2 vs VIP 3 fee and benefit comparison
+- VIP Level-Up Program: For existing VIP members on other exchanges (Binance, OKX, Bybit, Bitget, KuCoin, Gate.io, HTX)
+- Why Bitunix: 8 trust signals — awards, security, insurance, compliance
+- 4th Anniversary Campaign: $4M USDT prize pool with Tesla giveaway
+- FAQ: 6 commonly asked questions about the referral program
+
+## Bonus Tiers
+
+### Deposit Bonuses
+- Sign up: 20 USDT
+- Deposit $100+: +30 USDT
+- Deposit $500+: +50 USDT
+- Deposit $1,000+: +100 USDT
+- Deposit $5,000+: +500 USDT
+
+### Trading Volume Bonuses
+- Trade $10,000+: +100 USDT
+- Trade $50,000+: +400 USDT
+- Trade $250,000+: +1,500 USDT
+- Trade $1,000,000+: +5,000 USDT
+
+### Total Maximum: 7,700 USDT
+
+## VIP Benefits with BITUNIXBONUS
+
+| Feature | Standard (VIP 0) | With Code (VIP 2) | VIP 3 (Upgrade) |
+|---------|-------------------|--------------------|--------------------|
+| Spot Maker Fee | 0.0800% | 0.0600% | 0.0350% |
+| Spot Taker Fee | 0.1000% | 0.0800% | 0.0600% |
+| Futures Maker Fee | 0.0200% | 0.0160% | 0.0140% |
+| Futures Taker Fee | 0.0600% | 0.0500% | 0.0400% |
+| Weekly Mystery Box | None | Up to 200 USDT | Up to 500 USDT |
+| Fee Discount | 0% | 77.7% | Up to 87% |
+
+## Trust & Security
+
+- 3M+ registered users
+- 1,000+ trading pairs
+- $5B+ daily trading volume
+- BBB A+ rated
+- Ranked #7 globally (derivatives)
+- Fireblocks + Elliptic security infrastructure
+- $42M insurance fund
+- $30M Care Fund (USDC reserve)
+- On-chain Proof of Reserves
+- Licensed: US MSB, Canada MSB, Philippines VASP
+- Zero security breaches since launch
+
+## Blog
+
+Articles are sourced from the OrderBookX/articles GitHub repository covering:
+- Cryptocurrency trading guides
+- Bitunix platform features and tutorials
+- Futures trading strategies
+- Market analysis and insights
+- DeFi and blockchain education
+
+## Full Documentation
+
+For comprehensive details, see: [llms-full.txt](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/llms-full.txt)

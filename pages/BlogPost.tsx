@@ -29,13 +29,66 @@ const CTAWidget = ({ position = 'inline' }: { position?: string }) => (
   </div>
 );
 
-const markdownComponents = {
-  img: ({ src, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
-    // Hide images from cirrus-media CDN
-    if (src && src.includes('cirrus-media.bintangjtobing.workers.dev')) {
-      return null;
+/**
+ * Preprocess markdown content from GitHub before rendering:
+ * - Remove first H1 (duplicate with page title)
+ * - Remove all image tags
+ * - Strip link syntax from headings (keep text, remove hyperlink)
+ */
+function processMarkdownContent(md: string): string {
+  let processed = md;
+
+  // 1. Remove first ATX-style H1: "# Title here"
+  processed = processed.replace(/^#\s+[^\n]+\n*/m, '');
+
+  // 2. Remove all markdown image tags ![alt](url)
+  processed = processed.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
+
+  // 3. Strip link syntax from ATX-style headings
+  //    "## Text [Link](url) more" → "## Text Link more"
+  processed = processed.replace(/^(#{1,6}\s+.*)$/gm, (line) => {
+    return line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  });
+
+  // 4. Strip link syntax from setext-style headings (line before === or ---)
+  const lines = processed.split('\n');
+  for (let i = 0; i < lines.length - 1; i++) {
+    if (/^[=-]+\s*$/.test(lines[i + 1]) && lines[i].trim().length > 0) {
+      lines[i] = lines[i].replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
     }
-    return <img src={src} {...props} />;
+  }
+  processed = lines.join('\n');
+
+  // Clean up excess blank lines
+  processed = processed.replace(/\n{3,}/g, '\n\n');
+
+  return processed.trim();
+}
+
+const markdownComponents = {
+  // Remove all images
+  img: () => null,
+  // CTA links (register/signup) → styled button, other links stay normal
+  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    const isCTA = href && (href.includes('/register') || href.includes('vipCode='));
+    if (isCTA) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent('blog_cta_click', { cta_position: 'inline-article' })}
+          className="not-prose inline-flex items-center justify-center px-6 py-3 my-4 rounded-full font-bold bg-[#b9f641] text-black hover:bg-[#a6de3a] transition-all duration-300 no-underline hover:no-underline transform hover:scale-105"
+        >
+          {children} <ArrowRight className="ml-2 w-4 h-4" />
+        </a>
+      );
+    }
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+        {children}
+      </a>
+    );
   },
 };
 
@@ -153,7 +206,7 @@ export default function BlogPost() {
         {/* Markdown content */}
         <div className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-a:text-[#b9f641] prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-[#b9f641] prose-pre:bg-[#0f0f0f] prose-pre:border prose-pre:border-[#2a2a2a] prose-img:rounded-2xl prose-hr:border-[#2a2a2a] prose-th:text-white prose-td:text-gray-300 prose-table:border-collapse">
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
-            {content}
+            {processMarkdownContent(content)}
           </ReactMarkdown>
         </div>
 
