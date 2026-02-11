@@ -30,36 +30,53 @@ const CTAWidget = ({ position = 'inline' }: { position?: string }) => (
 );
 
 /**
- * Preprocess markdown content from GitHub before rendering:
- * - Remove first H1 (duplicate with page title)
- * - Remove all image tags
- * - Strip link syntax from headings (keep text, remove hyperlink)
+ * Preprocess markdown content from GitHub before rendering.
+ * Handles two article formats:
+ *   A) With YAML frontmatter + setext headings (Title\n==== / Title\n----)
+ *   B) Without frontmatter + ATX headings (# Title / ## Title)
  */
 function processMarkdownContent(md: string): string {
   let processed = md;
 
-  // 1. Remove first ATX-style H1: "# Title here"
-  processed = processed.replace(/^#\s+[^\n]+\n*/m, '');
+  // 1. Remove <figure> image blocks: <figure ...>![alt](url)</figure>
+  processed = processed.replace(/<figure[^>]*>.*?<\/figure>/gi, '');
 
-  // 2. Remove all markdown image tags ![alt](url)
+  // 2. Remove standalone markdown images ![alt](url)
   processed = processed.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
 
-  // 3. Strip link syntax from ATX-style headings
-  //    "## Text [Link](url) more" → "## Text Link more"
+  // 3. Convert <div> CTA wrappers to plain markdown links
+  processed = processed.replace(/<div[^>]*>\s*\[([^\]]+)\]\(([^)]+)\)\s*<\/div>/gi, '\n\n[$1]($2)\n\n');
+
+  // 4. Ensure closing HTML tags followed by text get a blank line between
+  processed = processed.replace(/(<\/(?:div|figure|table|p)>)([A-Za-z#*\[`_])/gi, '$1\n\n$2');
+
+  // 5. Remove setext H1: "Title\n====" (first occurrence — duplicate of page title)
+  processed = processed.replace(/^[^\n]+\n=+[ \t]*\n?/m, '');
+
+  // 6. Remove ATX H1: "# Title" (first occurrence — duplicate of page title)
+  processed = processed.replace(/^#\s+[^\n]+\n*/m, '');
+
+  // 7. Convert setext H2 headings to ATX ## with HR separator before
+  //    "Title\n----" → "---\n\n## Title"
+  processed = processed.replace(/^([^\n]+)\n-{2,}\s*$/gm, (_match, titleLine) => {
+    const trimmed = titleLine.trim();
+    // Skip lines that look like list items, table separators, HTML, or code
+    if (!trimmed || /^[-=<>|#`*+]/.test(trimmed)) return _match;
+    return `---\n\n## ${trimmed}`;
+  });
+
+  // 8. Strip link syntax from ATX headings: "## [Text](url) more" → "## Text more"
   processed = processed.replace(/^(#{1,6}\s+.*)$/gm, (line) => {
     return line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
   });
 
-  // 4. Strip link syntax from setext-style headings (line before === or ---)
-  const lines = processed.split('\n');
-  for (let i = 0; i < lines.length - 1; i++) {
-    if (/^[=-]+\s*$/.test(lines[i + 1]) && lines[i].trim().length > 0) {
-      lines[i] = lines[i].replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-    }
-  }
-  processed = lines.join('\n');
+  // 9. Ensure blank line before ATX headings (fixes ### not rendering)
+  processed = processed.replace(/([^\n])\n(#{1,6}\s)/g, '$1\n\n$2');
 
-  // Clean up excess blank lines
+  // 10. Ensure blank line before HR ---
+  processed = processed.replace(/([^\n])\n(---\s*\n)/g, '$1\n\n$2');
+
+  // 11. Clean up excess blank lines
   processed = processed.replace(/\n{3,}/g, '\n\n');
 
   return processed.trim();
@@ -68,28 +85,12 @@ function processMarkdownContent(md: string): string {
 const markdownComponents = {
   // Remove all images
   img: () => null,
-  // CTA links (register/signup) → styled button, other links stay normal
-  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-    const isCTA = href && (href.includes('/register') || href.includes('vipCode='));
-    if (isCTA) {
-      return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => trackEvent('blog_cta_click', { cta_position: 'inline-article' })}
-          className="not-prose inline-flex items-center justify-center px-6 py-3 my-4 rounded-full font-bold bg-[#b9f641] text-black hover:bg-[#a6de3a] transition-all duration-300 no-underline hover:no-underline transform hover:scale-105"
-        >
-          {children} <ArrowRight className="ml-2 w-4 h-4" />
-        </a>
-      );
-    }
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
-        {children}
-      </a>
-    );
-  },
+  // All links → normal hyperlinks (no CTA button styling)
+  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+      {children}
+    </a>
+  ),
 };
 
 export default function BlogPost() {
