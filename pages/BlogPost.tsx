@@ -10,6 +10,40 @@ import { parseFrontmatter } from '../lib/frontmatter';
 const REFERRAL_CODE = 'BITUNIXBONUS';
 const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}`;
 
+const CTAWidget = () => (
+  <div className="not-prose my-8 p-8 bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl text-center">
+    <h3 className="text-2xl font-black text-white mb-3">Ready to Start Trading?</h3>
+    <p className="text-gray-400 mb-6">
+      Use referral code <span className="text-[#b9f641] font-bold">{REFERRAL_CODE}</span> for up to 7,700 USDT bonus.
+    </p>
+    <a
+      href={REGISTER_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center justify-center px-8 py-4 rounded-full font-bold bg-[#b9f641] text-black hover:bg-[#a6de3a] transition-all duration-300 transform hover:scale-105 active:scale-95 pulse-glow"
+    >
+      Claim Your Bonus <ArrowRight className="ml-2 w-5 h-5" />
+    </a>
+  </div>
+);
+
+const markdownComponents = {
+  img: ({ src, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+    // Hide images from cirrus-media CDN
+    if (src && src.includes('cirrus-media.bintangjtobing.workers.dev')) {
+      return null;
+    }
+    return <img src={src} {...props} />;
+  },
+  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    // Replace bitunix register links with CTA widget
+    if (href && href.includes('bitunix.com/register')) {
+      return <CTAWidget />;
+    }
+    return <a href={href} {...props}>{children}</a>;
+  },
+};
+
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<ArticleFile | null>(null);
@@ -113,7 +147,7 @@ export default function BlogPost() {
 
         {/* Markdown content */}
         <div className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-a:text-[#b9f641] prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-[#b9f641] prose-pre:bg-[#0f0f0f] prose-pre:border prose-pre:border-[#2a2a2a] prose-img:rounded-2xl prose-hr:border-[#2a2a2a] prose-th:text-white prose-td:text-gray-300 prose-table:border-collapse">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={markdownComponents}>
             {content}
           </ReactMarkdown>
         </div>
