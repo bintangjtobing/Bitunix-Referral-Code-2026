@@ -3,13 +3,19 @@ import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { ArrowLeft, ArrowRight, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Tag, User, Clock } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
 
+const AUTHOR = 'BookXLabsJerry';
 const REFERRAL_CODE = 'BITUNIXBONUS';
 const REGISTER_URL = `https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=${REFERRAL_CODE}&utm_source=3rdparty&utm_medium=github-article`;
+
+function estimateReadingTime(text: string): number {
+  const words = text.replace(/<[^>]*>/g, '').replace(/[#*\[\]()!`>|_~-]/g, ' ').split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
 
 const CTAWidget = ({ position = 'inline' }: { position?: string }) => (
   <div className="not-prose my-8 p-8 bg-[#0f0f0f] border border-[#2a2a2a] rounded-3xl text-center">
@@ -186,23 +192,29 @@ export default function BlogPost() {
         <h1 className="text-3xl md:text-5xl font-black mb-6 leading-tight">{title || article?.title}</h1>
 
         {/* Meta */}
-        {(date || categories.length > 0) && (
-          <div className="flex flex-wrap items-center gap-4 mb-8 text-sm">
-            {date && (
-              <span className="flex items-center gap-1.5 text-gray-400">
-                <Calendar className="w-4 h-4" /> {date}
-              </span>
-            )}
-            {categories.map((cat) => (
-              <span
-                key={cat}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b9f641]/10 text-[#b9f641] text-xs font-bold"
-              >
-                <Tag className="w-3 h-3" /> {cat}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-4 mb-8 text-sm">
+          <span className="flex items-center gap-1.5 text-gray-400">
+            <User className="w-4 h-4" /> {AUTHOR}
+          </span>
+          {date && (
+            <span className="flex items-center gap-1.5 text-gray-400">
+              <Calendar className="w-4 h-4" /> {date}
+            </span>
+          )}
+          {content && (
+            <span className="flex items-center gap-1.5 text-gray-400">
+              <Clock className="w-4 h-4" /> {estimateReadingTime(content)} min read
+            </span>
+          )}
+          {categories.map((cat) => (
+            <span
+              key={cat}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b9f641]/10 text-[#b9f641] text-xs font-bold"
+            >
+              <Tag className="w-3 h-3" /> {cat}
+            </span>
+          ))}
+        </div>
 
         {/* Markdown content */}
         <div className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-a:text-[#b9f641] prose-a:no-underline hover:prose-a:underline prose-strong:text-white prose-code:text-[#b9f641] prose-pre:bg-[#0f0f0f] prose-pre:border prose-pre:border-[#2a2a2a] prose-img:rounded-2xl prose-hr:border-[#2a2a2a] prose-th:text-white prose-td:text-gray-300 prose-table:border-collapse">
