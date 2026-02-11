@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
@@ -68,7 +68,7 @@ export default function Blog() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [visible, setVisible] = useState(PER_PAGE);
 
   useEffect(() => {
     updateSEO({
@@ -89,30 +89,13 @@ export default function Blog() {
     return articles.filter((a) => a.title.toLowerCase().includes(q));
   }, [articles, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const currentPage = Math.min(page, totalPages);
-  const paginated = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const shown = filtered.slice(0, visible);
+  const hasMore = visible < filtered.length;
 
-  // Reset to page 1 when search changes
+  // Reset visible count when search changes
   useEffect(() => {
-    setPage(1);
+    setVisible(PER_PAGE);
   }, [search]);
-
-  // Track page changes
-  useEffect(() => {
-    if (currentPage > 1) {
-      trackEvent('blog_paginate', { page_number: currentPage });
-    }
-  }, [currentPage]);
-
-  // Windowed page numbers
-  const pageNumbers = useMemo(() => {
-    const pages: number[] = [];
-    const start = Math.max(1, currentPage - 2);
-    const end = Math.min(totalPages, currentPage + 2);
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  }, [currentPage, totalPages]);
 
   return (
     <div className="min-h-screen pt-32 pb-16 px-4">
@@ -170,7 +153,7 @@ export default function Blog() {
               {filtered.length} article{filtered.length !== 1 ? 's' : ''} found
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {paginated.map((article) => (
+              {shown.map((article) => (
                 <ArticleCard key={article.slug} article={article} />
               ))}
             </div>
@@ -182,63 +165,17 @@ export default function Blog() {
               </div>
             )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-12">
+            {/* Load More */}
+            {hasMore && (
+              <div className="text-center mt-12">
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => {
+                    setVisible((v) => v + PER_PAGE);
+                    trackEvent('blog_load_more', { new_visible: visible + PER_PAGE });
+                  }}
+                  className="px-8 py-3 rounded-full border border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50 transition-colors font-semibold"
                 >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-
-                {pageNumbers[0] > 1 && (
-                  <>
-                    <button
-                      onClick={() => setPage(1)}
-                      className="w-10 h-10 rounded-lg border border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50 transition-colors text-sm font-bold"
-                    >
-                      1
-                    </button>
-                    {pageNumbers[0] > 2 && <span className="text-gray-600 px-1">...</span>}
-                  </>
-                )}
-
-                {pageNumbers.map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setPage(n)}
-                    className={`w-10 h-10 rounded-lg border text-sm font-bold transition-colors ${
-                      n === currentPage
-                        ? 'bg-[#b9f641] text-black border-[#b9f641]'
-                        : 'border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50'
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-
-                {pageNumbers[pageNumbers.length - 1] < totalPages && (
-                  <>
-                    {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
-                      <span className="text-gray-600 px-1">...</span>
-                    )}
-                    <button
-                      onClick={() => setPage(totalPages)}
-                      className="w-10 h-10 rounded-lg border border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50 transition-colors text-sm font-bold"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-[#2a2a2a] text-gray-400 hover:text-white hover:border-[#b9f641]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
+                  Load More ({filtered.length - visible} remaining)
                 </button>
               </div>
             )}
