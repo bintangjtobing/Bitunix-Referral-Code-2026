@@ -2,6 +2,8 @@ export interface ArticleFile {
   path: string;
   slug: string;
   title: string;
+  date?: string;
+  excerpt?: string;
 }
 
 interface TreeResponse {

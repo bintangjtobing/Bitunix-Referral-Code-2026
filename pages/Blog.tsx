@@ -1,47 +1,81 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Clock } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
 
 const PER_PAGE = 24;
+const CONCURRENCY = 20;
 
 function extractExcerpt(raw: string, maxLen = 120): string {
   const { content } = parseFrontmatter(raw);
   let text = content
-    // Remove setext H1 (Title\n====)
     .replace(/^[^\n]+\n=+\s*\n?/m, '')
-    // Remove ATX H1
     .replace(/^#\s+[^\n]+\n*/m, '')
-    // Remove figure/image blocks
     .replace(/<figure[^>]*>.*?<\/figure>/gi, '')
     .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
-    // Remove HTML tags
     .replace(/<[^>]+>/g, '')
-    // Remove markdown formatting
     .replace(/[#*`>|~_]/g, '')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .trim();
 
-  // Get first non-empty paragraph
   const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 20);
   const first = (paragraphs[0] || '').replace(/\s+/g, ' ').trim();
   if (first.length <= maxLen) return first;
   return first.slice(0, maxLen).replace(/\s\S*$/, '') + '...';
 }
 
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 0) return 'just now';
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days > 1 ? 's' : ''} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`;
+  const years = Math.floor(months / 12);
+  return `${years} year${years > 1 ? 's' : ''} ago`;
+}
+
+async function enrichArticles(articles: ArticleFile[]): Promise<ArticleFile[]> {
+  const enriched = articles.map((a) => ({ ...a }));
+
+  for (let i = 0; i < enriched.length; i += CONCURRENCY) {
+    const batch = enriched.slice(i, i + CONCURRENCY);
+    await Promise.allSettled(
+      batch.map(async (article) => {
+        try {
+          const raw = await fetchArticleContent(article.path);
+          const { frontmatter } = parseFrontmatter(raw);
+          if (frontmatter.date) article.date = String(frontmatter.date);
+          article.excerpt = extractExcerpt(raw);
+        } catch {
+          // skip failed articles
+        }
+      })
+    );
+  }
+
+  // Sort newest first, undated articles at the end (alphabetical)
+  enriched.sort((a, b) => {
+    if (!a.date && !b.date) return a.title.localeCompare(b.title);
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return b.date.localeCompare(a.date);
+  });
+
+  return enriched;
+}
+
 function ArticleCard({ article }: { article: ArticleFile }) {
-  const [excerpt, setExcerpt] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchArticleContent(article.path)
-      .then((raw) => setExcerpt(extractExcerpt(raw)))
-      .catch(() => setExcerpt(''))
-      .finally(() => setLoading(false));
-  }, [article.path]);
-
   return (
     <Link
       to={`/blog/${encodeURIComponent(article.slug)}`}
@@ -51,13 +85,13 @@ function ArticleCard({ article }: { article: ArticleFile }) {
       <h2 className="text-lg font-bold text-white group-hover:text-[#b9f641] transition-colors leading-snug mb-2">
         {article.title}
       </h2>
-      {loading ? (
-        <div className="space-y-2">
-          <div className="h-3 bg-[#1a1a1a] rounded w-full animate-pulse" />
-          <div className="h-3 bg-[#1a1a1a] rounded w-3/4 animate-pulse" />
-        </div>
-      ) : (
-        excerpt && <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{excerpt}</p>
+      {article.excerpt && (
+        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-3">{article.excerpt}</p>
+      )}
+      {article.date && (
+        <span className="inline-flex items-center gap-1.5 text-xs text-gray-600">
+          <Clock className="w-3 h-3" /> Published {timeAgo(article.date)}
+        </span>
       )}
     </Link>
   );
@@ -78,6 +112,7 @@ export default function Blog() {
     });
     trackEvent('page_view', { page_title: 'Blog', page_path: '/blog' });
     fetchArticleList()
+      .then(enrichArticles)
       .then(setArticles)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -86,7 +121,9 @@ export default function Blog() {
   const filtered = useMemo(() => {
     if (!search.trim()) return articles;
     const q = search.toLowerCase();
-    return articles.filter((a) => a.title.toLowerCase().includes(q));
+    return articles.filter(
+      (a) => a.title.toLowerCase().includes(q) || (a.excerpt && a.excerpt.toLowerCase().includes(q))
+    );
   }, [articles, search]);
 
   const shown = filtered.slice(0, visible);
