@@ -16,7 +16,7 @@ Bitunix is a cryptocurrency derivatives exchange founded in 2021, ranked #10 on 
 ## Pages
 
 - [Home](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/): Main landing page with referral offer, bonus calculator, VIP comparison, FAQ
-- [Blog](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/#/blog): Crypto trading insights, guides, and Bitunix-related articles
+- [Blog](https://bintangjtobing.github.io/Bitunix-Referral-Code-2026/blog): Crypto trading insights, guides, and Bitunix-related articles
 - [Register on Bitunix](https://www.bitunix.com/register?inviteCode=ab9nr3&vipCode=BITUNIXBONUS): Sign up with referral code applied
 
 ## Key Sections (Home Page)

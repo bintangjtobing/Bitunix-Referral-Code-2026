@@ -255,7 +255,7 @@ The blog section features articles sourced from the OrderBookX/articles GitHub r
 - Framework: React 19 with TypeScript
 - Styling: Tailwind CSS with dark theme
 - Hosting: GitHub Pages
-- Routing: Hash-based (SPA)
+- Routing: BrowserRouter with GitHub Pages 404.html redirect (SPA)
 - Analytics: Google Analytics 4 + Microsoft Clarity
 - Content Source: GitHub API (OrderBookX/articles repository)
 - Performance: Vite-bundled, optimized for fast loading
