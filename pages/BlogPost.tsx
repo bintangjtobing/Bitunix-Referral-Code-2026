@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Calendar, Tag, User, Clock } from 'lucide-react'
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
+import { rewriteUtmParams } from '../lib/rewrite-utm';
 
 const AUTHOR = 'BookXLabsJerry';
 const REFERRAL_CODE = 'BITUNIXBONUS';
@@ -42,7 +43,7 @@ const CTAWidget = ({ position = 'inline' }: { position?: string }) => (
  *   B) Without frontmatter + ATX headings (# Title / ## Title)
  */
 function processMarkdownContent(md: string): string {
-  let processed = md;
+  let processed = rewriteUtmParams(md);
 
   // 1. Remove <figure> image blocks: <figure ...>![alt](url)</figure>
   processed = processed.replace(/<figure[^>]*>.*?<\/figure>/gi, '');

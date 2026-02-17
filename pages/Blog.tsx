@@ -4,12 +4,13 @@ import { Search, Clock } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
 import { parseFrontmatter } from '../lib/frontmatter';
 import { trackEvent, updateSEO } from '../lib/analytics';
+import { rewriteUtmParams } from '../lib/rewrite-utm';
 
 const PER_PAGE = 24;
 const CONCURRENCY = 20;
 
 function extractExcerpt(raw: string, maxLen = 120): string {
-  const { content } = parseFrontmatter(raw);
+  const { content } = parseFrontmatter(rewriteUtmParams(raw));
   let text = content
     .replace(/^[^\n]+\n=+\s*\n?/m, '')
     .replace(/^#\s+[^\n]+\n*/m, '')
