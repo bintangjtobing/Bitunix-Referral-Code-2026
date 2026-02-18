@@ -13,7 +13,7 @@ interface TreeResponse {
 const REPO = 'OrderBookX/articles';
 const BRANCH = 'main';
 const CACHE_KEY = 'blog_article_list';
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const CACHE_TTL = 2 * 60 * 1000; // 2 minutes
 
 const contentCache = new Map<string, string>();
 
