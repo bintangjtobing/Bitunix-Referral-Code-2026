@@ -65,12 +65,14 @@ async function enrichArticles(articles: ArticleFile[]): Promise<ArticleFile[]> {
     );
   }
 
-  // Sort newest first, undated articles at the end (alphabetical)
+  // Sort newest first, undated articles treated as today (likely newest)
+  const today = new Date().toISOString().split('T')[0];
   enriched.sort((a, b) => {
-    if (!a.date && !b.date) return a.title.localeCompare(b.title);
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return b.date.localeCompare(a.date);
+    const dateA = a.date || today;
+    const dateB = b.date || today;
+    const cmp = dateB.localeCompare(dateA);
+    if (cmp !== 0) return cmp;
+    return a.title.localeCompare(b.title);
   });
 
   return enriched;
