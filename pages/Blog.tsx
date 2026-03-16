@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Clock } from 'lucide-react';
 import { fetchArticleList, fetchArticleContent, type ArticleFile } from '../lib/github-api';
@@ -8,6 +8,7 @@ import { rewriteUtmParams } from '../lib/rewrite-utm';
 
 const PER_PAGE = 24;
 const CONCURRENCY = 20;
+const META_CACHE_KEY = 'blog_article_meta';
 
 function extractExcerpt(raw: string, maxLen = 120): string {
   const { content } = parseFrontmatter(rewriteUtmParams(raw));
@@ -46,13 +47,20 @@ function timeAgo(dateStr: string): string {
   return `${years} year${years > 1 ? 's' : ''} ago`;
 }
 
-async function enrichArticles(articles: ArticleFile[]): Promise<ArticleFile[]> {
-  const enriched = articles.map((a) => ({ ...a }));
+function loadMetaCache(): Record<string, { date?: string; excerpt?: string }> {
+  try {
+    return JSON.parse(sessionStorage.getItem(META_CACHE_KEY) || '{}');
+  } catch { return {}; }
+}
 
-  for (let i = 0; i < enriched.length; i += CONCURRENCY) {
-    const batch = enriched.slice(i, i + CONCURRENCY);
+function saveMetaCache(meta: Record<string, { date?: string; excerpt?: string }>) {
+  sessionStorage.setItem(META_CACHE_KEY, JSON.stringify(meta));
+}
+
+async function enrichBatch(articles: ArticleFile[]): Promise<void> {
+  for (let i = 0; i < articles.length; i += CONCURRENCY) {
     await Promise.allSettled(
-      batch.map(async (article) => {
+      articles.slice(i, i + CONCURRENCY).map(async (article) => {
         try {
           const raw = await fetchArticleContent(article.path);
           const { frontmatter } = parseFrontmatter(raw);
@@ -64,18 +72,6 @@ async function enrichArticles(articles: ArticleFile[]): Promise<ArticleFile[]> {
       })
     );
   }
-
-  // Sort newest first, undated articles treated as today (likely newest)
-  const today = new Date().toISOString().split('T')[0];
-  enriched.sort((a, b) => {
-    const dateA = a.date || today;
-    const dateB = b.date || today;
-    const cmp = dateB.localeCompare(dateA);
-    if (cmp !== 0) return cmp;
-    return a.title.localeCompare(b.title);
-  });
-
-  return enriched;
 }
 
 function ArticleCard({ article }: { article: ArticleFile }) {
@@ -106,6 +102,7 @@ export default function Blog() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PER_PAGE);
+  const enrichedRef = useRef(new Set<string>());
 
   useEffect(() => {
     updateSEO({
@@ -114,12 +111,47 @@ export default function Blog() {
       path: '/blog',
     });
     trackEvent('page_view', { page_title: 'Blog', page_path: '/blog' });
+
     fetchArticleList()
-      .then(enrichArticles)
-      .then(setArticles)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((list) => {
+        const meta = loadMetaCache();
+        for (const a of list) {
+          if (meta[a.slug]) {
+            a.date = meta[a.slug].date;
+            a.excerpt = meta[a.slug].excerpt;
+            enrichedRef.current.add(a.slug);
+          }
+        }
+        setArticles(list);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
   }, []);
+
+  // Progressive enrichment: only fetch content for visible articles
+  useEffect(() => {
+    if (articles.length === 0) return;
+    const toEnrich = articles
+      .slice(0, visible)
+      .filter((a) => !enrichedRef.current.has(a.slug));
+    if (toEnrich.length === 0) return;
+
+    let cancelled = false;
+    enrichBatch(toEnrich).then(() => {
+      if (cancelled) return;
+      const meta = loadMetaCache();
+      for (const a of toEnrich) {
+        enrichedRef.current.add(a.slug);
+        meta[a.slug] = { date: a.date, excerpt: a.excerpt };
+      }
+      saveMetaCache(meta);
+      setArticles((prev) => prev.map((a) => ({ ...a })));
+    });
+    return () => { cancelled = true; };
+  }, [articles.length, visible]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return articles;
